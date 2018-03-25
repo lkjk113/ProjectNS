@@ -4,14 +4,19 @@
 Temp/
 Obj/
 UnityGenerated/
-Library/
+Library/*/
+Library/*.log
+*.exe
+*.dll
 Assets/AssetStoreTools*
+NoobWorld_Data/
+
 
 # ===================================== #
 # Visual Studio / MonoDevelop generated #
 # ===================================== #
 ExportedObj/
-
+.vs/
 # User-specific files
 *.suo
 *.user
@@ -32,8 +37,6 @@ bld/
 [Bb]in/
 [Oo]bj/
 [Ll]og/
-
-
 
 
 # ============ #
