@@ -361,6 +361,25 @@ public class CharactorController2d : MonoBehaviour
     }
 
 
+    public void OnClickA()
+    {
+        AddAction(InputActions.Hit);
+    }
+
+    public void OnClickAOver()
+    {
+        RemoveAction(InputActions.Hit);
+    }
+
+    public void OnClickB()
+    {
+        
+    }
+    public void OnClickBOver()
+    {
+       
+    }
+
 
     void AddAction(InputActions another)
     {
