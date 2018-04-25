@@ -19,6 +19,7 @@ namespace Assets.Enums
 
     public enum InputActions
     {
+        None,
         MoveLeft,
         MoveRight,
         MoveUp,
