@@ -96,7 +96,7 @@ public class CharactorController2d : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-
+        bool CrouchPress = false;
         animator.SetBool("landing", Landing);
         animator.SetBool("landed", Landed);
         var action = InputActions.None;
@@ -105,10 +105,10 @@ public class CharactorController2d : MonoBehaviour
             if (Input.GetKey(keyCode))
             {
                 action = GetAction(keyCode);
-                DoAction(action);
+                DoAction(action, ref CrouchPress);
             }
         }
-        DoAction(VirtualAction);
+        DoAction(VirtualAction, ref CrouchPress);
 
         if (action != InputActions.MoveLeft && action != InputActions.MoveRight && action != InputActions.Hit)
         {
@@ -122,9 +122,9 @@ public class CharactorController2d : MonoBehaviour
         }
     }
 
-    void DoAction(InputActions action)
+    void DoAction(InputActions action, ref bool crouchPress)
     {
-        bool CrouchPress = false;
+
         if ((action & InputActions.Jump) == InputActions.Jump)//跳跃
         {
             if (Landed && !Jumping && !Crouching)
@@ -137,7 +137,7 @@ public class CharactorController2d : MonoBehaviour
         }
         if ((action & InputActions.Crouch) == InputActions.Crouch)//蹲下
         {
-            CrouchPress = true;
+            crouchPress = true;
             if (Landed)
             {
                 if (!Crouching)
@@ -172,7 +172,7 @@ public class CharactorController2d : MonoBehaviour
         if ((action & InputActions.MoveRight) == InputActions.MoveRight)//右移
             StartCoroutine(Move(false));
 
-        if (!CrouchPress)
+        if (!crouchPress)
         {
             Crouching = false;
         }
@@ -326,13 +326,13 @@ public class CharactorController2d : MonoBehaviour
         var moveRange = stick.transform.localPosition - initPosition;
 
 
-        if (stick.transform.localPosition.x < 0f)//左移
+        if (stick.transform.localPosition.x < r * 0.5)//左移
         {
             ResetAction();
             AddAction(InputActions.MoveLeft);
         }
 
-        if (stick.transform.localPosition.x > 0f)//右移
+        if (stick.transform.localPosition.x > r * 0.5)//右移
         {
             ResetAction();
             AddAction(InputActions.MoveRight);
