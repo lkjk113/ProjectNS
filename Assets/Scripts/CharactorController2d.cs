@@ -18,6 +18,10 @@ public class CharactorController2d : MonoBehaviour
     float jumpTime;
 
     /// <summary>
+    /// 虚拟摇杆动作
+    /// </summary>
+    InputActions VirtualAction;
+    /// <summary>
     /// 是否蹲下
     /// </summary>
     bool Crouching;
@@ -82,6 +86,11 @@ public class CharactorController2d : MonoBehaviour
         collider = GetComponent<Collider2D>();
         Jumping = false;
         jumpTime = 0.1f;
+
+        //虚拟摇杆
+        //获取border对象的transform组件  
+        initPosition = stick.transform.localPosition;
+        r = Vector3.Distance(stick.transform.localPosition, border.transform.localPosition);
     }
 
     // Update is called once per frame
@@ -90,78 +99,82 @@ public class CharactorController2d : MonoBehaviour
 
         animator.SetBool("landing", Landing);
         animator.SetBool("landed", Landed);
-        bool CrouchPress = false;
-        var act = InputActions.None;
+        var action = InputActions.None;
         foreach (KeyCode keyCode in Enum.GetValues(typeof(KeyCode)))
         {
             if (Input.GetKey(keyCode))
             {
-                act = GetAction(keyCode);
-                switch (act)
+                action = GetAction(keyCode);
+                DoAction(action);
+            }
+        }
+        DoAction(VirtualAction);
+
+        if (action != InputActions.MoveLeft && action != InputActions.MoveRight && action != InputActions.Hit)
+        {
+            if ((VirtualAction & (InputActions.MoveLeft | InputActions.MoveRight | InputActions.Hit)) == 0)
+            {
+                //没有按左右键时
+                animator.SetFloat("speed", 0);
+                if (Landed && !Jumping && !Crouching && !Hitting)//复位
+                    animator.Play("Idle");
+            }
+        }
+    }
+
+    void DoAction(InputActions action)
+    {
+        bool CrouchPress = false;
+        if ((action & InputActions.Jump) == InputActions.Jump)//跳跃
+        {
+            if (Landed && !Jumping && !Crouching)
+            {
+                //播放上跳动画
+                animator.Play("Jump");
+                Jumping = true;
+                StartCoroutine(Jump());
+            }
+        }
+        if ((action & InputActions.Crouch) == InputActions.Crouch)//蹲下
+        {
+            CrouchPress = true;
+            if (Landed)
+            {
+                if (!Crouching)
+                    //播放下蹲动画
+                    animator.Play("Crouch");
+                Crouching = true;
+            }
+        }
+
+        if ((action & InputActions.Hit) == InputActions.Hit)//攻击1
+        {
+            if (!Landing)//空中攻击
+            {
+                StartCoroutine(Jumphit());
+            }
+            else if (Crouching)//下蹲攻击
+            {
+
+            }
+            else//普通攻击
+            {
+                if (!Hitting)
                 {
-
-                    case InputActions.MoveUp://上移
-                        break;
-                    case InputActions.MoveDown://下移
-                        //gameObject.transform.Translate(Vector2.down * moveSpeed * Time.deltaTime);
-                        break;
-                    case InputActions.Jump://跳跃
-                        if (Landed && !Jumping && !Crouching)
-                        {
-                            //播放上跳动画
-                            animator.Play("PrincessJump");
-                            Jumping = true;
-                            StartCoroutine(Jump());
-                        }
-                        break;
-                    case InputActions.Crouch://蹲下
-                        CrouchPress = true;
-                        if (Landed)
-                        {
-                            if (!Crouching)
-                                //播放下蹲动画
-                                animator.Play("PrincessCrouch");
-                            Crouching = true;
-                        }
-                        break;
-                    case InputActions.Hit://攻击1
-                        if (!Landing)//空中攻击
-                        {
-
-                            StartCoroutine(Airit());
-                        }
-                        else if (Crouching)//下蹲攻击
-                        {
-
-                        }
-                        else//普通攻击
-                        {
-                            if (!Hitting)
-                            {
-                                Hitting = true;
-                                StartCoroutine(Hit());
-                            }
-                        }
-
-                        break;
-                    case InputActions.MoveLeft://左移
-                    case InputActions.MoveRight://右移
-                        StartCoroutine(Move(act == InputActions.MoveLeft));
-                        break;
-                    default:
-                        break;
+                    Hitting = true;
+                    StartCoroutine(Hit());
                 }
             }
         }
+
+        if ((action & InputActions.MoveLeft) == InputActions.MoveLeft)//左移
+            StartCoroutine(Move(true));
+        if ((action & InputActions.MoveRight) == InputActions.MoveRight)//右移
+            StartCoroutine(Move(false));
+
         if (!CrouchPress)
         {
             Crouching = false;
-        }
-        if (act != InputActions.MoveLeft && act != InputActions.MoveRight && act != InputActions.Hit)//没有按左右键时
-        {
-            animator.SetFloat("speed", 0);
-            if (Landed && !Jumping && !Crouching && !Hitting)//复位
-                animator.Play("PrincessIdle");
         }
     }
 
@@ -169,15 +182,15 @@ public class CharactorController2d : MonoBehaviour
     /// 移动
     /// </summary>
     /// <returns></returns>
-    IEnumerator Move(bool moveLeft)
+    IEnumerator Move(bool towardsLeft)
     {
-        spriteRenderer.flipX = moveLeft; //转身
+        spriteRenderer.flipX = towardsLeft; //转身
 
         if (Hitting)//移动攻击 
         {
-            animator.Play("PrincessHit");
+            animator.Play("Hit");
             moveSpeed = 6;
-            transform.Translate((moveLeft ? Vector2.left : Vector2.right) * moveSpeed * Time.deltaTime);
+            transform.Translate((towardsLeft ? Vector2.left : Vector2.right) * moveSpeed * Time.deltaTime);
         }
 
         if (!Crouching && !Hitting)//站立攻击
@@ -187,15 +200,15 @@ public class CharactorController2d : MonoBehaviour
             {
                 moveSpeed = 21;
                 //if (!Jumping)//坠落
-                //    animator.Play("PrincessFall");
+                //    animator.Play("Fall");
             }
             else
             {
                 moveSpeed = 25;
-                animator.Play("PrincessRun");
+                animator.Play("Run");
             }
             animator.SetFloat("speed", moveSpeed);
-            transform.Translate((moveLeft ? Vector2.left : Vector2.right) * moveSpeed * Time.deltaTime);
+            transform.Translate((towardsLeft ? Vector2.left : Vector2.right) * moveSpeed * Time.deltaTime);
         }
 
         yield return null;
@@ -206,14 +219,14 @@ public class CharactorController2d : MonoBehaviour
     /// </summary>
     IEnumerator Hit()
     {
-        animator.Play("PrincessHit");
+        animator.Play("Hit");
         yield return new WaitForSeconds(0.2f);
         Hitting = false;
     }
 
-    IEnumerator Airit()
+    IEnumerator Jumphit()
     {
-        animator.Play("PrincessAirhit");
+        animator.Play("Jumphit");
         yield return new WaitForSeconds(0.2f);
     }
 
@@ -255,7 +268,7 @@ public class CharactorController2d : MonoBehaviour
     IEnumerator Fall()
     {
         yield return new WaitForSeconds(0.3f);//等待上升到最高时刻再下降
-        animator.Play("PrincessFall");
+        animator.Play("Fall");
         Jumping = false;
         rigidbody.gravityScale = 10;
     }
@@ -272,4 +285,97 @@ public class CharactorController2d : MonoBehaviour
     }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //虚拟方向按钮初始位置  
+    Vector3 initPosition;
+    //虚拟方向按钮可移动的半径  
+    float r;
+    //border对象  
+    public GameObject border;
+
+    public GameObject stick;
+
+    //鼠标拖拽  
+    public void OnDragIng()
+    {
+
+        stick.transform.localPosition = Input.mousePosition;
+
+        if (Vector3.Distance(Input.mousePosition, initPosition) > 64)        //如果鼠标到虚拟键盘原点的位置 > 半径r  
+        {
+            //计算出鼠标和原点之间的向量  
+            Vector3 dir = Input.mousePosition - initPosition;
+            //这里dir.normalized是向量归一化的意思，实在不理解你可以理解成这就是一个方向，就是原点到鼠标的方向，乘以半径你可以理解成在原点到鼠标的方向上加上半径的距离  
+            stick.transform.localPosition = initPosition + dir.normalized * 64;
+        }
+
+        var moveRange = stick.transform.localPosition - initPosition;
+
+
+        if (stick.transform.localPosition.x < 0f)//左移
+        {
+            ResetAction();
+            AddAction(InputActions.MoveLeft);
+        }
+
+        if (stick.transform.localPosition.x > 0f)//右移
+        {
+            ResetAction();
+            AddAction(InputActions.MoveRight);
+        }
+
+        if (stick.transform.localPosition.y > r * 0.5 && !Jumping)//跳跃
+            AddAction(InputActions.Jump);
+        else
+            RemoveAction(InputActions.Jump);
+
+        if (stick.transform.localPosition.y < -r * 0.5)//下蹲
+        {
+            ResetAction();
+            AddAction(InputActions.Crouch);
+        }
+
+
+    }
+    //鼠标松开  
+    public void OnDragEnd()
+    {
+        //松开鼠标虚拟摇杆回到原点  
+        stick.transform.localPosition = initPosition;
+
+        ResetAction();
+    }
+
+
+
+    void AddAction(InputActions another)
+    {
+        if ((VirtualAction & another) != another)
+            VirtualAction = (InputActions)((int)VirtualAction + (int)another);
+    }
+
+    void RemoveAction(InputActions another)
+    {
+        if ((VirtualAction & another) == another)
+            VirtualAction = (InputActions)((int)VirtualAction - (int)another);
+    }
+
+    void ResetAction()
+    {
+        VirtualAction = InputActions.None;
+    }
 }

@@ -18,9 +18,8 @@ namespace Assets.Scripts
                 Dictionary<InputActions, KeyCode> actions = new Dictionary<InputActions, KeyCode>();
                 actions.Add(InputActions.MoveLeft, KeyCode.A);
                 actions.Add(InputActions.MoveRight, KeyCode.D);
-                actions.Add(InputActions.MoveUp, KeyCode.W);
                 actions.Add(InputActions.Crouch, KeyCode.S);
-                actions.Add(InputActions.Jump, KeyCode.K);
+                actions.Add(InputActions.Jump, KeyCode.W);
                 actions.Add(InputActions.Hit, KeyCode.J);
                 return actions;
             }
