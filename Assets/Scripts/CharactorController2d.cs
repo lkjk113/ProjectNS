@@ -89,8 +89,8 @@ public class CharactorController2d : MonoBehaviour
 
         //虚拟摇杆
         //获取border对象的transform组件  
-        initPosition = stick.transform.localPosition;
-        r = Vector3.Distance(stick.transform.localPosition, border.transform.localPosition);
+        initPosition = stick.transform.position;
+        r = Vector2.Distance(stick.transform.position, border.transform.position);
     }
 
     // Update is called once per frame
@@ -312,38 +312,37 @@ public class CharactorController2d : MonoBehaviour
     //鼠标拖拽  
     public void OnDragIng()
     {
+        var clickPos = (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        stick.transform.position = clickPos;
 
-        stick.transform.localPosition = Input.mousePosition;
-
-        if (Vector3.Distance(Input.mousePosition, initPosition) > 64)        //如果鼠标到虚拟键盘原点的位置 > 半径r  
+        if (Vector2.Distance(clickPos, initPosition) > r)        //如果鼠标到虚拟键盘原点的位置 > 半径r  
         {
             //计算出鼠标和原点之间的向量  
-            Vector3 dir = Input.mousePosition - initPosition;
+            Vector2 dir = clickPos - (Vector2)initPosition;
             //这里dir.normalized是向量归一化的意思，实在不理解你可以理解成这就是一个方向，就是原点到鼠标的方向，乘以半径你可以理解成在原点到鼠标的方向上加上半径的距离  
-            stick.transform.localPosition = initPosition + dir.normalized * 64;
+            stick.transform.position = (Vector2)initPosition + dir.normalized * r;
         }
 
-        var moveRange = stick.transform.localPosition - initPosition;
+        var moveRange = (Vector2)stick.transform.position - (Vector2)initPosition;
 
-
-        if (stick.transform.localPosition.x < r * 0.5)//左移
+        if (moveRange.x < -r * 0.5)//左移
         {
             ResetAction();
             AddAction(InputActions.MoveLeft);
         }
 
-        if (stick.transform.localPosition.x > r * 0.5)//右移
+        if (moveRange.x > r * 0.5)//右移
         {
             ResetAction();
             AddAction(InputActions.MoveRight);
         }
 
-        if (stick.transform.localPosition.y > r * 0.5 && !Jumping)//跳跃
+        if (moveRange.y > r * 0.5 && !Jumping)//跳跃
             AddAction(InputActions.Jump);
         else
             RemoveAction(InputActions.Jump);
 
-        if (stick.transform.localPosition.y < -r * 0.5)//下蹲
+        if (moveRange.y < -r * 0.5)//下蹲
         {
             ResetAction();
             AddAction(InputActions.Crouch);
@@ -355,7 +354,7 @@ public class CharactorController2d : MonoBehaviour
     public void OnDragEnd()
     {
         //松开鼠标虚拟摇杆回到原点  
-        stick.transform.localPosition = initPosition;
+        stick.transform.position = initPosition;
 
         ResetAction();
     }
@@ -373,11 +372,11 @@ public class CharactorController2d : MonoBehaviour
 
     public void OnClickB()
     {
-        
+
     }
     public void OnClickBOver()
     {
-       
+
     }
 
 
