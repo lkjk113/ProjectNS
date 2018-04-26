@@ -313,42 +313,45 @@ public class CharactorController2d : MonoBehaviour
     public void OnDragIng()
     {
         var clickPos = (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        stick.transform.position = clickPos;
 
-        if (Vector2.Distance(clickPos, initPosition) > r)        //如果鼠标到虚拟键盘原点的位置 > 半径r  
+        if (clickPos.x <= border.transform.position.x && clickPos.y <= border.transform.position.y) //防多点误触
         {
-            //计算出鼠标和原点之间的向量  
-            Vector2 dir = clickPos - (Vector2)initPosition;
-            //这里dir.normalized是向量归一化的意思，实在不理解你可以理解成这就是一个方向，就是原点到鼠标的方向，乘以半径你可以理解成在原点到鼠标的方向上加上半径的距离  
-            stick.transform.position = (Vector2)initPosition + dir.normalized * r;
+            stick.transform.position = clickPos;
+
+            if (Vector2.Distance(clickPos, initPosition) > r)        //如果鼠标到虚拟键盘原点的位置 > 半径r  
+            {
+                //计算出鼠标和原点之间的向量  
+                Vector2 dir = clickPos - (Vector2)initPosition;
+                //这里dir.normalized是向量归一化的意思，实在不理解你可以理解成这就是一个方向，就是原点到鼠标的方向，乘以半径你可以理解成在原点到鼠标的方向上加上半径的距离  
+                stick.transform.position = (Vector2)initPosition + dir.normalized * r;
+            }
+
+            var moveRange = (Vector2)stick.transform.position - (Vector2)initPosition;
+
+            if (moveRange.x < -r * 0.5)//左移
+            {
+                ResetAction();
+                AddAction(InputActions.MoveLeft);
+            }
+
+            if (moveRange.x > r * 0.5)//右移
+            {
+                ResetAction();
+                AddAction(InputActions.MoveRight);
+            }
+
+            if (moveRange.y > r * 0.5 && !Jumping)//跳跃
+                AddAction(InputActions.Jump);
+            else
+                RemoveAction(InputActions.Jump);
+
+            if (moveRange.y < -r * 0.5)//下蹲
+            {
+                ResetAction();
+                AddAction(InputActions.Crouch);
+            }
+
         }
-
-        var moveRange = (Vector2)stick.transform.position - (Vector2)initPosition;
-
-        if (moveRange.x < -r * 0.5)//左移
-        {
-            ResetAction();
-            AddAction(InputActions.MoveLeft);
-        }
-
-        if (moveRange.x > r * 0.5)//右移
-        {
-            ResetAction();
-            AddAction(InputActions.MoveRight);
-        }
-
-        if (moveRange.y > r * 0.5 && !Jumping)//跳跃
-            AddAction(InputActions.Jump);
-        else
-            RemoveAction(InputActions.Jump);
-
-        if (moveRange.y < -r * 0.5)//下蹲
-        {
-            ResetAction();
-            AddAction(InputActions.Crouch);
-        }
-
-
     }
     //鼠标松开  
     public void OnDragEnd()
