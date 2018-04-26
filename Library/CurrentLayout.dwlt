@@ -189,7 +189,7 @@ MonoBehaviour:
   m_MinSize: {x: 713, y: 492}
   m_MaxSize: {x: 18008, y: 14042}
   vertical: 0
-  controlID: 131
+  controlID: 11
 --- !u!114 &9
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -465,23 +465,23 @@ MonoBehaviour:
   m_PersistentViewDataDictionary: {fileID: 0}
   m_TreeViewState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 
+    m_SelectedIDs: 3a280000
     m_LastClickedID: 0
-    m_ExpandedIDs: a03dfcff903efcffa23ffcff7cd1feff4ad2feff60d3feff9cfbffff9efbffff00000000a42a0000bc2a0000f42a0000102b0000562b0000922e00009c2e0000e62e00002c2f00007a2f0000
+    m_ExpandedIDs: cab5ffff96b6ffffa8b7ffff9cfbffff9efbffff00000000bc2a0000102b0000562b0000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
-      m_Name: Princess
-      m_OriginalName: Princess
+      m_Name: 
+      m_OriginalName: 
       m_EditFieldRect:
         serializedVersion: 2
         x: 0
         y: 0
         width: 0
         height: 0
-      m_UserData: 12126
+      m_UserData: 0
       m_IsWaitingForDelay: 0
       m_IsRenaming: 0
-      m_OriginalEventType: 0
+      m_OriginalEventType: 11
       m_IsRenamingFilename: 0
       m_ClientGUIView: {fileID: 10}
     m_SearchString: 
@@ -564,7 +564,7 @@ MonoBehaviour:
     m_ShowAllHits: 0
     m_SearchArea: 0
     m_Folders:
-    - Assets/Scripts
+    - Assets/Animations
   m_ViewMode: 0
   m_StartGridSize: 64
   m_LastFolders: []
@@ -768,9 +768,9 @@ MonoBehaviour:
   m_isRotationLocked: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: -8.679503, y: -0.74075294, z: 0.26116312}
+    m_Target: {x: -10.575672, y: -5.8991427, z: 0.44655782}
     speed: 2
-    m_Value: {x: -8.679503, y: -0.74075294, z: 0.26116312}
+    m_Value: {x: -10.575672, y: -5.8991427, z: 0.44655782}
   m_RenderMode: 0
   m_ValidateTrueMetals: 0
   m_SceneViewState:
@@ -798,9 +798,9 @@ MonoBehaviour:
     speed: 2
     m_Value: {x: 0, y: 0, z: 0, w: 1}
   m_Size:
-    m_Target: 41.718597
+    m_Target: 23.190056
     speed: 2
-    m_Value: 41.718597
+    m_Value: 23.190056
   m_Ortho:
     m_Target: 1
     speed: 2
